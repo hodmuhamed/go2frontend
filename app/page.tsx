@@ -1,9 +1,12 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
+import Image from "next/image";
+import Link from "next/link";
+
+import CategorySection from "./components/CategorySection";
 import client from "../lib/apolloClient";
 import { GET_POSTS } from "../lib/queries/postsQuery";
-import Link from "next/link";
 
 type WPPost = {
   id: string;
@@ -11,69 +14,115 @@ type WPPost = {
   slug: string;
   date: string;
   excerpt: string;
+  customLabel?: string | null;
   featuredImage?: { node?: { sourceUrl?: string } };
 };
 
-function Card({ post, layout = "default" }: { post: WPPost; layout?: "hero" | "featured" | "default" }) {
+const formatDate = (date: string) => {
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) {
+    return date;
+  }
+
+  return parsed.toLocaleDateString("bs-BA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+function HeroPost({ post }: { post: WPPost }) {
   const img = post.featuredImage?.node?.sourceUrl;
   const href = `https://go2njemacka.de/${post.slug}`;
 
-  const base =
-    "group relative overflow-hidden rounded-3xl bg-white shadow-md ring-1 ring-black/5 transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5";
-  const imgClass =
-    layout === "hero"
-      ? "h-[360px] md:h-[420px] w-full object-cover"
-      : layout === "featured"
-      ? "h-56 w-full object-cover"
-      : "h-44 w-full object-cover";
-
   return (
-    <Link href={href} target="_blank" className={base}>
-      <div className="relative">
-        {img ? (
-          <img src={img} alt={post.title} className={`${imgClass} transition-transform duration-500 group-hover:scale-105`} />
-        ) : (
-          <div className={`${imgClass} bg-gradient-to-br from-gray-100 to-gray-200`} />
-        )}
-        {layout === "hero" && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        )}
-      </div>
+    <Link
+      href={href}
+      target="_blank"
+      className="group relative flex h-full min-h-[420px] overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-2xl"
+    >
+      {img ? (
+        <Image
+          src={img}
+          alt={post.title}
+          fill
+          priority
+          sizes="(min-width: 1024px) 65vw, 100vw"
+          className="absolute inset-0 h-full w-full object-cover brightness-[0.9] transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
 
-      <div
-        className={
-          layout === "hero"
-            ? "absolute inset-x-0 bottom-0 p-6 md:p-8 text-white"
-            : "p-5"
-        }
-      >
-        <h3
-          className={
-            layout === "hero"
-              ? "text-2xl md:text-3xl font-extrabold leading-snug drop-shadow"
-              : layout === "featured"
-              ? "text-lg font-semibold text-gray-900"
-              : "text-base font-semibold text-gray-900"
-          }
+      <div className="relative z-10 mt-auto flex flex-col gap-5 p-8 md:p-12">
+        <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200 backdrop-blur">
+          Istaknuta priča
+        </span>
+        <h1
+          className="text-3xl font-semibold leading-tight text-white drop-shadow-sm md:text-4xl"
           dangerouslySetInnerHTML={{ __html: post.title }}
         />
-        <div
-          className={
-            layout === "hero"
-              ? "mt-3 hidden md:block text-white/90"
-              : "mt-2 line-clamp-3 text-gray-600 text-sm"
-          }
+        <p
+          className="max-w-2xl text-base text-white/80 md:text-lg"
           dangerouslySetInnerHTML={{ __html: post.excerpt }}
         />
-        <span
-          className={
-            layout === "hero"
-              ? "mt-4 inline-flex items-center gap-1 text-emerald-300 font-semibold"
-              : "mt-3 inline-flex items-center gap-1 text-emerald-700 font-semibold"
-          }
-        >
-          Čitaj više →
-        </span>
+        <div className="flex flex-wrap items-center gap-4 text-sm text-white/70">
+          <span>{formatDate(post.date)}</span>
+          <span className="hidden h-1 w-1 rounded-full bg-white/50 md:inline-block" />
+          <span className="inline-flex items-center gap-2 text-emerald-200">
+            Čitaj priču <span aria-hidden>→</span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function ArticleCard({ post, emphasis = "default" }: { post: WPPost; emphasis?: "default" | "compact" }) {
+  const img = post.featuredImage?.node?.sourceUrl;
+  const href = `https://go2njemacka.de/${post.slug}`;
+  const isCompact = emphasis === "compact";
+
+  return (
+    <Link
+      href={href}
+      target="_blank"
+      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+        isCompact ? "md:flex-row md:items-stretch" : ""
+      }`}
+    >
+      <div className={`overflow-hidden ${isCompact ? "md:w-40 md:flex-shrink-0" : "w-full"}`}>
+        {img ? (
+          <Image
+            src={img}
+            alt={post.title}
+            width={640}
+            height={360}
+            sizes={isCompact ? "(min-width: 768px) 10rem, 100vw" : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"}
+            className={`h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+              isCompact ? "md:h-full" : ""
+            }`}
+          />
+        ) : (
+          <div className="h-40 w-full bg-gradient-to-br from-slate-100 via-slate-50 to-white" />
+        )}
+      </div>
+      <div className={`flex flex-col gap-3 ${isCompact ? "flex-1 p-5 md:p-6" : "p-6"}`}>
+        <span className="text-xs font-semibold uppercase tracking-wide text-emerald-600/80">Go2Njemačka Blog</span>
+        <h3
+          className={`text-slate-900 transition-colors group-hover:text-emerald-700 ${
+            isCompact ? "text-lg font-semibold" : "text-xl font-semibold"
+          }`}
+          dangerouslySetInnerHTML={{ __html: post.title }}
+        />
+        {!isCompact && (
+          <p
+            className="line-clamp-3 text-sm text-slate-600"
+            dangerouslySetInnerHTML={{ __html: post.excerpt }}
+          />
+        )}
+        <span className="mt-auto text-xs font-medium text-slate-500">{formatDate(post.date)}</span>
       </div>
     </Link>
   );
@@ -84,92 +133,178 @@ export default function Home() {
 
   if (loading)
     return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-gray-500 text-lg animate-pulse">Učitavam sadržaj…</p>
+      <div className="grid min-h-screen place-items-center bg-slate-50">
+        <p className="text-lg text-slate-500">Učitavam sadržaj…</p>
       </div>
     );
 
   if (error)
     return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-red-600 text-lg">Greška: {error.message}</p>
+      <div className="grid min-h-screen place-items-center bg-slate-50">
+        <p className="text-lg text-red-600">Greška: {error.message}</p>
       </div>
     );
 
   const posts: WPPost[] = data?.posts?.nodes ?? [];
   if (posts.length === 0) {
     return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-gray-500">Nema objava.</p>
+      <div className="grid min-h-screen place-items-center bg-slate-50">
+        <p className="text-slate-500">Nema objava.</p>
       </div>
     );
   }
 
   const [hero, ...rest] = posts;
-  const featured = rest.slice(0, 4);
-  const latest = rest.slice(4);
+  const highlights = rest.slice(0, 3);
+  const gallery = rest.slice(3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">
-      <header className="sticky top-0 z-50 backdrop-blur bg-white/70 border-b border-gray-200">
-        <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="text-emerald-700 font-extrabold text-xl">
+    <div className="scroll-smooth bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+          <Link href="/" className="text-xl font-semibold text-slate-900">
             Go2Njemačka Blog
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-gray-700">
-            <a href="/" className="hover:text-emerald-700">Početna</a>
-            <a href="https://go2njemacka.de" target="_blank" className="hover:text-emerald-700">Posjeti sajt</a>
+          <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
+            <a href="#home" className="transition hover:text-emerald-600">
+              Početna
+            </a>
+            <a href="#dolazak" className="transition hover:text-emerald-600">
+              Blog
+            </a>
+            <a href="#about" className="transition hover:text-emerald-600">
+              O nama
+            </a>
+            <a href="#contact" className="transition hover:text-emerald-600">
+              Kontakt
+            </a>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-10 space-y-12">
-        <section>
-          <Card post={hero} layout="hero" />
+      <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-16 px-4 py-12">
+        <section id="home" className="grid gap-10 lg:grid-cols-[1.2fr,0.8fr]">
+          <HeroPost post={hero} />
+
+          {highlights.length > 0 && (
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-slate-800">U fokusu</h2>
+                <span className="text-xs font-medium uppercase tracking-wider text-emerald-600/80">Najčitanije</span>
+              </div>
+              <div className="flex flex-col gap-4">
+                {highlights.map((post) => (
+                  <ArticleCard key={post.id} post={post} emphasis="compact" />
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
-        {featured.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900">Izdvojeno</h2>
+        <CategorySection title="Dolazak u Njemačku" slug="dolazak-u-njemacku" sectionId="dolazak" />
+
+        <CategorySection title="Savjeti" slug="savjeti" sectionId="savjeti" accentColor="bg-sky-500" />
+
+        {gallery.length > 0 && (
+          <section id="blog" className="space-y-6">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-3xl font-semibold tracking-tight text-slate-900">Najnovije priče</h2>
+                <p className="text-sm text-slate-600">
+                  Aktualne informacije i savjeti za život i rad u Njemačkoj.
+                </p>
+              </div>
               <a
                 href="https://go2njemacka.de"
                 target="_blank"
-                className="text-emerald-700 hover:underline font-medium"
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:border-emerald-200 hover:bg-emerald-50"
               >
-                Sve objave →
+                Sve objave
+                <span aria-hidden>→</span>
               </a>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {featured.map((p) => (
-                <Card key={p.id} post={p} layout="featured" />
+
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {gallery.map((post) => (
+                <ArticleCard key={post.id} post={post} />
               ))}
             </div>
           </section>
         )}
 
-        {latest.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900">Najnovije</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {latest.map((p) => (
-                <Card key={p.id} post={p} />
-              ))}
+        <section id="about" className="overflow-hidden rounded-[28px] border border-slate-100 bg-white p-8 shadow-lg md:p-12">
+          <div className="grid gap-8 md:grid-cols-2 md:items-center">
+            <div className="space-y-4">
+              <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                O nama
+              </span>
+              <h2 className="text-3xl font-semibold text-slate-900">Priče, iskustva i savjeti iz prve ruke</h2>
+              <p className="text-base text-slate-600">
+                Go2Njemačka Blog okuplja stručnjake, mentore i zajednicu koja dijeli stvarne priče o preseljenju,
+                zapošljavanju i životu u Njemačkoj. Naš cilj je da vam ponudimo provjerene informacije i inspiraciju za
+                naredni korak.
+              </p>
             </div>
-          </section>
-        )}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-100 via-white to-emerald-50 p-6">
+              <div className="space-y-4 text-sm text-slate-600">
+                <p className="font-semibold text-slate-800">Šta možete očekivati?</p>
+                <ul className="list-disc space-y-2 pl-5">
+                  <li>Vodiče i checkliste za birokratske procese.</li>
+                  <li>Intervjue sa našom zajednicom i stručnjacima.</li>
+                  <li>Aktualne vijesti i trendove sa njemačkog tržišta rada.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="contact"
+          className="rounded-[28px] border border-emerald-100 bg-gradient-to-r from-emerald-600 to-emerald-500 p-8 text-white shadow-xl md:p-12"
+        >
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-xl space-y-3">
+              <h2 className="text-3xl font-semibold">Povežimo se</h2>
+              <p className="text-sm text-emerald-50">
+                Treba vam personalizirana podrška ili imate priču koju želite podijeliti? Javite nam se i postanite dio
+                zajednice Go2Njemačka.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <a
+                href="https://go2njemacka.de/kontakt"
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-emerald-700 shadow-md transition hover:shadow-lg"
+              >
+                Kontaktiraj tim
+              </a>
+              <a
+                href="mailto:info@go2njemacka.de"
+                className="inline-flex items-center gap-2 rounded-full border border-white/60 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                info@go2njemacka.de
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
 
-      <footer className="mt-12 border-t border-gray-200">
-        <div className="mx-auto max-w-7xl px-4 py-6 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-slate-200 bg-white/80">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Go2Njemačka.de — Sva prava zadržana.</p>
           <div className="flex items-center gap-5">
-            <a href="https://go2njemacka.de/kontakt" target="_blank" className="hover:text-gray-700">Kontakt</a>
-            <a href="https://go2njemacka.de/o-nama" target="_blank" className="hover:text-gray-700">O nama</a>
+            <a href="https://go2njemacka.de/o-nama" target="_blank" className="transition hover:text-slate-700">
+              O nama
+            </a>
+            <a href="https://go2njemacka.de/kontakt" target="_blank" className="transition hover:text-slate-700">
+              Kontakt
+            </a>
+            <a href="https://go2njemacka.de" target="_blank" className="transition hover:text-slate-700">
+              Posjeti Go2Njemačka
+            </a>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
