@@ -64,7 +64,6 @@ type CategoryPost = {
   excerpt: string;
   customLabel?: string | null;
   featuredImage?: { node?: { sourceUrl?: string | null } | null } | null;
-  [key: string]: unknown;
 };
 
 export default function CategorySection({ title, slug, accentColor = "bg-red-500", sectionId }: CategorySectionProps) {
@@ -73,13 +72,7 @@ export default function CategorySection({ title, slug, accentColor = "bg-red-500
     variables: { slug, first: 5 },
   });
 
-  const nodes = (data?.posts?.nodes ?? []) as CategoryPost[];
-  const posts = nodes.map((post) => ({
-    ...post,
-    customLabel:
-      (post.customLabel as string | null | undefined) ??
-      ((post.customFields as { customLabel?: string | null } | undefined)?.customLabel ?? null),
-  }));
+  const posts = (data?.posts?.nodes ?? []) as CategoryPost[];
 
   const [hero, ...rest] = posts;
 
@@ -143,7 +136,7 @@ type CardProps = {
 function CategoryHeroCard({ post, accentColor }: CardProps) {
   const img = post.featuredImage?.node?.sourceUrl ?? null;
   const href = buildHref(post.slug);
-  const label = (post.customLabel as string | undefined) || "";
+  const label = post.customLabel ?? "";
 
   return (
     <Link
@@ -186,7 +179,7 @@ function CategoryHeroCard({ post, accentColor }: CardProps) {
 function CategoryListCard({ post, accentColor }: CardProps) {
   const img = post.featuredImage?.node?.sourceUrl ?? null;
   const href = buildHref(post.slug);
-  const label = (post.customLabel as string | undefined) || "";
+  const label = post.customLabel ?? "";
 
   return (
     <Link
