@@ -159,17 +159,17 @@ export default function Home() {
   const gallery = rest.slice(3);
 
   return (
-    <div className="scroll-smooth bg-[#f3f6fb] text-slate-900">
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/" className="text-xl font-semibold tracking-tight text-slate-900">
+    <div className="scroll-smooth bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+          <Link href="/" className="text-xl font-semibold text-slate-900">
             Go2Njemačka Blog
           </Link>
-          <nav className="hidden items-center gap-6 text-sm font-semibold uppercase tracking-[0.25em] text-slate-500 md:flex">
+          <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
             <a href="#home" className="transition hover:text-emerald-600">
               Početna
             </a>
-            <a href="#blog" className="transition hover:text-emerald-600">
+            <a href="#dolazak" className="transition hover:text-emerald-600">
               Blog
             </a>
             <a href="#about" className="transition hover:text-emerald-600">
@@ -182,15 +182,15 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-4 pb-16 pt-12 sm:px-6">
-        <section id="home" className="grid gap-8 scroll-mt-28 lg:grid-cols-[1.2fr,0.8fr]">
+      <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-16 px-4 py-12">
+        <section id="home" className="grid gap-10 lg:grid-cols-[1.2fr,0.8fr]">
           <HeroPost post={hero} />
 
           {highlights.length > 0 && (
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold uppercase tracking-[0.25em] text-slate-700">U fokusu</h2>
-                <span className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600/80">Najčitanije</span>
+                <h2 className="text-lg font-semibold text-slate-800">U fokusu</h2>
+                <span className="text-xs font-medium uppercase tracking-wider text-emerald-600/80">Najčitanije</span>
               </div>
               <div className="flex flex-col gap-4">
                 {highlights.map((post) => (
@@ -206,7 +206,7 @@ export default function Home() {
         <CategorySection title="Savjeti" slug="savjeti" sectionId="savjeti" accentColor="bg-sky-500" />
 
         {gallery.length > 0 && (
-          <section id="blog" className="space-y-6 scroll-mt-28">
+          <section id="blog" className="space-y-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-3xl font-semibold tracking-tight text-slate-900">Najnovije priče</h2>
@@ -232,10 +232,7 @@ export default function Home() {
           </section>
         )}
 
-        <section
-          id="about"
-          className="scroll-mt-28 overflow-hidden rounded-[28px] border border-slate-200 bg-white p-8 shadow-md md:p-12"
-        >
+        <section id="about" className="overflow-hidden rounded-[28px] border border-slate-100 bg-white p-8 shadow-lg md:p-12">
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div className="space-y-4">
               <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
@@ -263,7 +260,7 @@ export default function Home() {
 
         <section
           id="contact"
-          className="scroll-mt-28 rounded-[28px] border border-emerald-100 bg-gradient-to-r from-emerald-600 to-emerald-500 p-8 text-white shadow-xl md:p-12"
+          className="rounded-[28px] border border-emerald-100 bg-gradient-to-r from-emerald-600 to-emerald-500 p-8 text-white shadow-xl md:p-12"
         >
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl space-y-3">
@@ -292,8 +289,8 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white/90">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between sm:px-6">
+      <footer className="border-t border-slate-200 bg-white/80">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Go2Njemačka.de — Sva prava zadržana.</p>
           <div className="flex items-center gap-5">
             <a href="https://go2njemacka.de/o-nama" target="_blank" className="transition hover:text-slate-700">
