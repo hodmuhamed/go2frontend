@@ -106,7 +106,7 @@ export default function CategorySection({ title, slug, accentColor = "bg-red-500
   return (
     <section
       id={sectionId}
-      className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm"
+      className="scroll-mt-28 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm"
     >
       <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5 sm:px-8">
         <span className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-slate-800">

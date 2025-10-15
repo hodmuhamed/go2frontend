@@ -169,7 +169,7 @@ export default function Home() {
             <a href="#home" className="transition hover:text-emerald-600">
               Početna
             </a>
-            <a href="#dolazak" className="transition hover:text-emerald-600">
+            <a href="#blog" className="transition hover:text-emerald-600">
               Blog
             </a>
             <a href="#about" className="transition hover:text-emerald-600">
@@ -183,7 +183,7 @@ export default function Home() {
       </header>
 
       <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-4 pb-16 pt-12 sm:px-6">
-        <section id="home" className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
+        <section id="home" className="grid gap-8 scroll-mt-28 lg:grid-cols-[1.2fr,0.8fr]">
           <HeroPost post={hero} />
 
           {highlights.length > 0 && (
@@ -206,7 +206,7 @@ export default function Home() {
         <CategorySection title="Savjeti" slug="savjeti" sectionId="savjeti" accentColor="bg-sky-500" />
 
         {gallery.length > 0 && (
-          <section id="blog" className="space-y-6">
+          <section id="blog" className="space-y-6 scroll-mt-28">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-3xl font-semibold tracking-tight text-slate-900">Najnovije priče</h2>
@@ -234,7 +234,7 @@ export default function Home() {
 
         <section
           id="about"
-          className="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-8 shadow-md md:p-12"
+          className="scroll-mt-28 overflow-hidden rounded-[28px] border border-slate-200 bg-white p-8 shadow-md md:p-12"
         >
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div className="space-y-4">
@@ -263,7 +263,7 @@ export default function Home() {
 
         <section
           id="contact"
-          className="rounded-[28px] border border-emerald-100 bg-gradient-to-r from-emerald-600 to-emerald-500 p-8 text-white shadow-xl md:p-12"
+          className="scroll-mt-28 rounded-[28px] border border-emerald-100 bg-gradient-to-r from-emerald-600 to-emerald-500 p-8 text-white shadow-xl md:p-12"
         >
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl space-y-3">
