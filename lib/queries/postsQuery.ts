@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const GET_POSTS = gql`
   query GetPosts {
-    posts(first: 10) {
+    posts(first: 18) {
       nodes {
         id
         title
@@ -10,6 +10,11 @@ export const GET_POSTS = gql`
         date
         excerpt
         commentCount
+        categories {
+          nodes {
+            name
+          }
+        }
         featuredImage {
           node {
             sourceUrl

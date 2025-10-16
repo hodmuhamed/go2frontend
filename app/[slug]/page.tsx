@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import Sidebar, { SidebarPost } from "../components/Sidebar";
+import Footer from "../components/Footer";
 import client from "../../lib/apolloClient";
 import { GET_POST_BY_SLUG } from "../../lib/queries/postBySlugQuery";
 import { GET_RELATED_POSTS } from "../../lib/queries/relatedPostsQuery";
@@ -109,48 +110,52 @@ export default async function PostPage({ params, searchParams }: PageProps) {
     const pageInfo = categoryData.posts?.pageInfo;
 
     return (
-      <div className="bg-[#F8F9FB] px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
-          <div className="flex flex-col gap-10">
-            <header className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
-              <span className="text-sm font-semibold uppercase tracking-[0.35em] text-[#FF5C5C]">Kategorija</span>
-              <h1 className="mt-3 text-4xl font-semibold font-heading text-slate-900">{categoryData.category.name}</h1>
-              <div className="mt-4 h-1 w-24 rounded-full bg-[#007BFF]" />
-              {categoryData.category.description ? (
-                <p
-                  className="mt-4 max-w-3xl text-sm text-slate-600 sm:text-base"
-                  dangerouslySetInnerHTML={{ __html: categoryData.category.description }}
-                />
-              ) : null}
-            </header>
+      <div className="bg-[#F8F9FB]">
+        <div className="px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+            <div className="flex flex-col gap-10">
+              <header className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
+                <span className="text-sm font-semibold uppercase tracking-[0.35em] text-[#FF5C5C]">Kategorija</span>
+                <h1 className="mt-3 text-4xl font-semibold font-heading text-slate-900">{categoryData.category.name}</h1>
+                <div className="mt-4 h-1 w-24 rounded-full bg-[#007BFF]" />
+                {categoryData.category.description ? (
+                  <p
+                    className="mt-4 max-w-3xl text-sm text-slate-600 sm:text-base"
+                    dangerouslySetInnerHTML={{ __html: categoryData.category.description }}
+                  />
+                ) : null}
+              </header>
 
-            <section className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
-              {posts.length === 0 ? (
-                <p className="text-slate-500">Još nema objava u ovoj kategoriji.</p>
-              ) : (
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {posts.map((postItem) => (
-                    <ArchiveCard key={postItem.id} post={postItem} />
-                  ))}
-                </div>
-              )}
+              <section className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
+                {posts.length === 0 ? (
+                  <p className="text-slate-500">Još nema objava u ovoj kategoriji.</p>
+                ) : (
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    {posts.map((postItem) => (
+                      <ArchiveCard key={postItem.id} post={postItem} />
+                    ))}
+                  </div>
+                )}
 
-              {pageInfo?.hasNextPage && pageInfo.endCursor ? (
-                <div className="mt-8 flex justify-center">
-                  <Link
-                    href={`?after=${encodeURIComponent(pageInfo.endCursor)}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#007BFF]/20 px-5 py-2.5 text-sm font-semibold text-[#007BFF] transition hover:border-[#007BFF]/40 hover:bg-[#007BFF]/10"
-                  >
-                    Učitaj još
-                    <span aria-hidden>→</span>
-                  </Link>
-                </div>
-              ) : null}
-            </section>
+                {pageInfo?.hasNextPage && pageInfo.endCursor ? (
+                  <div className="mt-8 flex justify-center">
+                    <Link
+                      href={`?after=${encodeURIComponent(pageInfo.endCursor)}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-[#007BFF]/20 px-5 py-2.5 text-sm font-semibold text-[#007BFF] transition hover:border-[#007BFF]/40 hover:bg-[#007BFF]/10"
+                    >
+                      Učitaj još
+                      <span aria-hidden>→</span>
+                    </Link>
+                  </div>
+                ) : null}
+              </section>
+            </div>
+
+            <Sidebar posts={sidebarPosts} />
           </div>
-
-          <Sidebar posts={sidebarPosts} />
         </div>
+
+        <Footer />
       </div>
     );
   }
@@ -170,59 +175,63 @@ export default async function PostPage({ params, searchParams }: PageProps) {
     : [];
 
   return (
-    <div className="bg-[#F8F9FB] px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
-        <article className="flex flex-col gap-10">
-          <header className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
-            <Link
-              href={primaryCategory ? `/category/${primaryCategory.slug}` : "/"}
-              className="inline-flex items-center gap-2 rounded-full bg-[#FF5C5C]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-[#FF5C5C] transition hover:bg-[#FF5C5C]/20"
-            >
-              {primaryCategory ? primaryCategory.name : "Blog"}
-            </Link>
-            <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 font-heading" dangerouslySetInnerHTML={{ __html: post.title }} />
-            <div className="mt-4 h-1 w-24 rounded-full bg-[#007BFF]" />
-            <div className="mt-4 text-sm text-slate-500">
-              {post.author?.node?.name ? <span className="font-medium text-slate-700">{post.author.node.name}</span> : null}
-              {post.author?.node?.name ? <span className="mx-2 text-slate-400">•</span> : null}
-              <span>{formatDate(post.date)}</span>
-            </div>
-          </header>
-
-          {post.featuredImage?.node?.sourceUrl ? (
-            <div className="overflow-hidden rounded-[32px] bg-white shadow-md">
-              <div className="relative h-80 w-full sm:h-[420px]">
-                <Image
-                  src={post.featuredImage.node.sourceUrl}
-                  alt={post.title}
-                  fill
-                  sizes="(min-width: 1024px) 60vw, 100vw"
-                  className="rounded-[32px] object-cover"
-                />
+    <div className="bg-[#F8F9FB]">
+      <div className="px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+          <article className="flex flex-col gap-10">
+            <header className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
+              <Link
+                href={primaryCategory ? `/category/${primaryCategory.slug}` : "/"}
+                className="inline-flex items-center gap-2 rounded-full bg-[#FF5C5C]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-[#FF5C5C] transition hover:bg-[#FF5C5C]/20"
+              >
+                {primaryCategory ? primaryCategory.name : "Blog"}
+              </Link>
+              <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 font-heading" dangerouslySetInnerHTML={{ __html: post.title }} />
+              <div className="mt-4 h-1 w-24 rounded-full bg-[#007BFF]" />
+              <div className="mt-4 text-sm text-slate-500">
+                {post.author?.node?.name ? <span className="font-medium text-slate-700">{post.author.node.name}</span> : null}
+                {post.author?.node?.name ? <span className="mx-2 text-slate-400">•</span> : null}
+                <span>{formatDate(post.date)}</span>
               </div>
-            </div>
-          ) : null}
+            </header>
 
-          <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-md sm:p-10">
-            <div className="wp-content" dangerouslySetInnerHTML={{ __html: post.content }} />
-
-            <ShareSection url={canonicalUrl} title={post.title} />
-          </div>
-
-          {related.length > 0 && (
-            <section className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
-              <h2 className="text-2xl font-semibold uppercase tracking-[0.3em] text-slate-700">Povezane priče</h2>
-              <div className="mt-6 grid gap-6 sm:grid-cols-3">
-                {related.map((relatedPost) => (
-                  <RelatedCard key={relatedPost.id} post={relatedPost} />
-                ))}
+            {post.featuredImage?.node?.sourceUrl ? (
+              <div className="overflow-hidden rounded-[32px] bg-white shadow-md">
+                <div className="relative h-80 w-full sm:h-[420px]">
+                  <Image
+                    src={post.featuredImage.node.sourceUrl}
+                    alt={post.title}
+                    fill
+                    sizes="(min-width: 1024px) 60vw, 100vw"
+                    className="rounded-[32px] object-cover"
+                  />
+                </div>
               </div>
-            </section>
-          )}
-        </article>
+            ) : null}
 
-        <Sidebar posts={sidebarPosts} />
+            <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-md sm:p-10">
+              <div className="wp-content" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+              <ShareSection url={canonicalUrl} title={post.title} />
+            </div>
+
+            {related.length > 0 && (
+              <section className="rounded-[32px] bg-white p-6 shadow-md sm:p-10">
+                <h2 className="text-2xl font-semibold uppercase tracking-[0.3em] text-slate-700">Povezane priče</h2>
+                <div className="mt-6 grid gap-6 sm:grid-cols-3">
+                  {related.map((relatedPost) => (
+                    <RelatedCard key={relatedPost.id} post={relatedPost} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </article>
+
+          <Sidebar posts={sidebarPosts} />
+        </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

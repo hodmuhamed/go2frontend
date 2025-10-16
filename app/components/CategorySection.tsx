@@ -130,7 +130,7 @@ export default function CategorySection({
           href={`/category/${slug}`}
           className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500 transition hover:text-slate-700"
         >
-          Sve iz sekcije
+          SVE IZ SEKCIJE
         </Link>
       </div>
       <div className="h-px bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />

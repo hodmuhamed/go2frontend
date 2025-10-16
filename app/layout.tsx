@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import ApolloProviderWrapper from "./providers/ApolloProviderWrapper";
 import Header from "./components/Header";
@@ -11,7 +11,7 @@ const inter = Inter({
   display: "swap",
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-heading",
   weight: ["500", "600", "700"],
@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bs" className={`${inter.variable} ${plusJakarta.variable}`}>
+    <html lang="bs" className={`${inter.variable} ${poppins.variable}`}>
       <body className="min-h-screen bg-[#F8F9FB] text-slate-900">
         <ApolloProviderWrapper>
           <Header />
