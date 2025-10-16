@@ -1,22 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import ApolloProviderWrapper from "./providers/ApolloProviderWrapper";
-import Header from "../components/Header";
+import Header from "./components/Header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  variable: "--font-heading",
+  weight: ["500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "MojShop",
-  description: "Next.js frontend povezan s WordPress GraphQL backendom",
+  title: "Go2Njemačka Blog",
+  description: "Go2Njemačka — Vodič kroz život i rad u Njemačkoj",
 };
 
 export default function RootLayout({
@@ -25,26 +29,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bs">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-gray-50 text-gray-900 min-h-screen`}
-      >
+    <html lang="bs" className={`${inter.variable} ${plusJakarta.variable}`}>
+      <body className="min-h-screen bg-[#F8F9FB] text-slate-900">
         <ApolloProviderWrapper>
-          {/* HEADER */}
           <Header />
-
-          {/* MAIN CONTENT */}
-          <main className="pt-24 px-4 sm:px-8 md:px-16 lg:px-24">
+          <main className="font-body">
             {children}
           </main>
-
-          {/* FOOTER */}
-          <footer className="text-center text-sm text-gray-500 mt-16 mb-6">
-            © {new Date().getFullYear()} MojShop. Sva prava zadržana.
-          </footer>
         </ApolloProviderWrapper>
       </body>
     </html>
   );
 }
-
