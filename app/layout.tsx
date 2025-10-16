@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ApolloProviderWrapper from "./providers/ApolloProviderWrapper";
-import Header from "../components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,23 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bs">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-gray-50 text-gray-900 min-h-screen`}
-      >
-        <ApolloProviderWrapper>
-          {/* HEADER */}
-          <Header />
-
-          {/* MAIN CONTENT */}
-          <main className="pt-24 px-4 sm:px-8 md:px-16 lg:px-24">
-            {children}
-          </main>
-
-          {/* FOOTER */}
-          <footer className="text-center text-sm text-gray-500 mt-16 mb-6">
-            © {new Date().getFullYear()} MojShop. Sva prava zadržana.
-          </footer>
-        </ApolloProviderWrapper>
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-slate-50 text-slate-900`}>
+        <ApolloProviderWrapper>{children}</ApolloProviderWrapper>
       </body>
     </html>
   );
