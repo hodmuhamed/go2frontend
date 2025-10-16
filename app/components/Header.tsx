@@ -1,21 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-const NAV_LINKS = [
+type NavLink = {
+  href: string;
+  label: string;
+  isAnchor?: boolean;
+};
+
+const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Početna" },
-  { href: "#dolazak", label: "Kategorije", isAnchor: true },
-  { href: "#contact", label: "Kontakt", isAnchor: true },
+  { href: "/#dolazak", label: "Kategorije", isAnchor: true },
+  { href: "/#contact", label: "Kontakt", isAnchor: true },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 8);
     };
 
     handleScroll();
@@ -24,7 +32,9 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (!isMenuOpen) return;
+    if (!isMenuOpen) {
+      return;
+    }
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -36,44 +46,59 @@ export default function Header() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    if (isMenuOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+
+    return undefined;
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  const resolvedLinks = useMemo(() => NAV_LINKS, []);
+
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-shadow duration-300 ${
-        isScrolled ? "bg-white/95 shadow-md backdrop-blur" : "bg-white/90"
+      className={`sticky top-0 z-50 w-full border-b border-transparent transition duration-300 ${
+        isScrolled ? "bg-white/95 shadow-lg shadow-slate-900/5 backdrop-blur" : "bg-white/90"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 text-lg font-semibold font-heading text-slate-900">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#007BFF] text-white">G2</span>
-          Go2Njemačka Blog
+      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <Link
+          href="/"
+          className="flex flex-none items-center gap-3 rounded-full bg-white/80 px-3 py-1.5 shadow-inner shadow-slate-200/60 transition hover:bg-white"
+        >
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#007BFF] to-[#0056b3] text-sm font-semibold text-white">
+            G2
+          </span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Go2Njemačka</span>
+            <span className="text-base font-heading font-semibold text-slate-900">Blog</span>
+          </div>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 lg:flex">
-          {NAV_LINKS.map((link) => (
-            link.isAnchor ? (
-              <a
-                key={link.label}
-                href={link.href}
-                className="uppercase tracking-[0.25em] transition hover:text-[#007BFF]"
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="uppercase tracking-[0.25em] transition hover:text-[#007BFF]"
-              >
-                {link.label}
-              </Link>
-            )
-          ))}
+        <nav className="hidden flex-1 items-center justify-center gap-2 lg:flex">
+          {resolvedLinks.map((link) => {
+            const isActive = !link.isAnchor ? pathname === link.href : pathname === "/";
+            return <DesktopNavLink key={link.label} link={link} isActive={isActive} />;
+          })}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
-            className="hidden h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-[#007BFF]/40 hover:text-[#007BFF] lg:flex"
+            className="hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 shadow-sm transition hover:border-[#007BFF]/40 hover:text-[#007BFF] hover:shadow-md lg:flex"
             aria-label="Pretraga"
           >
             <svg
@@ -89,9 +114,27 @@ export default function Header() {
             </svg>
           </button>
 
+          <Link
+            href="/#newsletter"
+            className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-[#007BFF] to-[#0056b3] px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg lg:inline-flex"
+          >
+            Newsletter
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              className="h-4 w-4"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </Link>
+
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-[#007BFF]/40 hover:text-[#007BFF] lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-[#007BFF]/40 hover:text-[#007BFF] hover:shadow-md lg:hidden"
             onClick={() => setIsMenuOpen(true)}
             aria-label="Otvori navigaciju"
           >
@@ -111,23 +154,53 @@ export default function Header() {
         </div>
       </div>
 
-      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      {isMenuOpen ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-sm lg:hidden"
+          aria-label="Zatvori meni"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      ) : null}
+
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        links={resolvedLinks}
+      />
     </header>
   );
 }
 
-function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function DesktopNavLink({ link, isActive }: { link: NavLink; isActive: boolean }) {
+  const className = `relative inline-flex items-center rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] transition ${
+    isActive ? "text-[#007BFF]" : "text-slate-600 hover:text-[#007BFF]"
+  }`;
+
   return (
-    <div
-      className={`fixed inset-y-0 right-0 z-50 w-72 max-w-full transform bg-white shadow-xl transition-transform duration-300 ${
+    <Link href={link.href} className={className} aria-current={isActive ? "page" : undefined}>
+      {link.label}
+      <span
+        className={`pointer-events-none absolute inset-x-3 -bottom-1 h-1 rounded-full transition ${
+          isActive ? "bg-gradient-to-r from-[#FF5C5C] via-[#FF8F8F] to-[#007BFF]" : "bg-transparent"
+        }`}
+      />
+    </Link>
+  );
+}
+
+function MobileMenu({ isOpen, onClose, links }: { isOpen: boolean; onClose: () => void; links: NavLink[] }) {
+  return (
+    <aside
+      className={`fixed inset-y-0 right-0 z-50 w-80 max-w-full transform bg-white shadow-2xl transition-transform duration-300 ease-out lg:hidden ${
         isOpen ? "translate-x-0" : "translate-x-full"
       }`}
     >
-      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-        <span className="text-base font-semibold uppercase tracking-[0.3em] text-slate-700">Meni</span>
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
+        <span className="text-base font-semibold uppercase tracking-[0.3em] text-slate-700">Navigacija</span>
         <button
           type="button"
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-[#007BFF]/40 hover:text-[#007BFF]"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-[#007BFF]/40 hover:text-[#007BFF]"
           onClick={onClose}
           aria-label="Zatvori navigaciju"
         >
@@ -144,29 +217,47 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           </svg>
         </button>
       </div>
-      <nav className="flex flex-col gap-4 px-4 py-6">
-        {NAV_LINKS.map((link) => (
-          link.isAnchor ? (
-            <a
-              key={link.label}
-              href={link.href}
-              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-[#007BFF] hover:bg-[#007BFF]/5 hover:text-[#007BFF]"
-              onClick={onClose}
-            >
-              {link.label}
-            </a>
-          ) : (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-[#007BFF] hover:bg-[#007BFF]/5 hover:text-[#007BFF]"
-              onClick={onClose}
-            >
-              {link.label}
-            </Link>
-          )
+      <nav className="flex flex-col gap-3 px-5 py-6">
+        {links.map((link) => (
+          <Link
+            key={link.label}
+            href={link.href}
+            className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-[#007BFF] hover:bg-[#007BFF]/5 hover:text-[#007BFF]"
+            onClick={onClose}
+          >
+            {link.label}
+          </Link>
         ))}
       </nav>
-    </div>
+      <div className="mt-auto space-y-4 border-t border-slate-200 px-5 py-6 text-sm text-slate-600">
+        <p className="font-semibold uppercase tracking-[0.3em] text-slate-500">Pratite nas</p>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="https://www.instagram.com/go2njemacka"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 transition hover:border-[#007BFF] hover:text-[#007BFF]"
+          >
+            Instagram
+          </Link>
+          <Link
+            href="https://www.facebook.com/go2njemacka"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 transition hover:border-[#007BFF] hover:text-[#007BFF]"
+          >
+            Facebook
+          </Link>
+          <Link
+            href="https://www.youtube.com/@go2njemacka"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 transition hover:border-[#007BFF] hover:text-[#007BFF]"
+          >
+            YouTube
+          </Link>
+        </div>
+      </div>
+    </aside>
   );
 }

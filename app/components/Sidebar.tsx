@@ -20,7 +20,7 @@ export default function Sidebar({ posts }: SidebarProps) {
 
   return (
     <aside className="mt-12 w-full space-y-10 lg:mt-0 lg:w-80 lg:shrink-0 lg:sticky lg:top-28">
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-md">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-md" id="newsletter">
         <h3 className="mb-4 text-lg font-semibold uppercase tracking-[0.3em] text-slate-700">Najčitanije</h3>
         <div className="space-y-4">
           {topPosts.map((post, index) => (

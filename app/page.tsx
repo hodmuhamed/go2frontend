@@ -186,7 +186,10 @@ function HeroPost({ post }: PostCardProps) {
   const href = `/${post.slug}`;
 
   return (
-    <Link href={href} className="group relative flex min-h-[320px] flex-col overflow-hidden rounded-[28px]">
+    <Link
+      href={href}
+      className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-[28px] sm:min-h-[300px]"
+    >
       {img ? (
         <Image
           src={img}
