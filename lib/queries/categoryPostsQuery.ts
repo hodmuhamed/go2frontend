@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const GET_POSTS = gql`
-  query GetPosts {
-    posts(first: 10) {
+export const GET_CATEGORY_POSTS = gql`
+  query GetCategoryPosts($slug: String!, $first: Int = 5) {
+    posts(first: $first, where: { categoryName: $slug }) {
       nodes {
         id
         title
@@ -19,4 +19,3 @@ export const GET_POSTS = gql`
     }
   }
 `;
-
