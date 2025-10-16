@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import ApolloProviderWrapper from "./providers/ApolloProviderWrapper";
+import Header from "./components/Header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const poppins = Poppins({
   subsets: ["latin"],
+  variable: "--font-heading",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "MojShop",
-  description: "Next.js frontend povezan s WordPress GraphQL backendom",
+  title: "Go2Njemačka Blog",
+  description: "Go2Njemačka — Vodič kroz život i rad u Njemačkoj",
 };
 
 export default function RootLayout({
@@ -24,11 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bs">
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-slate-50 text-slate-900`}>
-        <ApolloProviderWrapper>{children}</ApolloProviderWrapper>
+    <html lang="bs" className={`${inter.variable} ${poppins.variable}`}>
+      <body className="min-h-screen bg-[#F8F9FB] text-slate-900">
+        <ApolloProviderWrapper>
+          <Header />
+          <main className="font-body">
+            {children}
+          </main>
+        </ApolloProviderWrapper>
       </body>
     </html>
   );
 }
-

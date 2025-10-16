@@ -9,6 +9,7 @@ export const GET_POSTS = gql`
         slug
         date
         excerpt
+        commentCount
         featuredImage {
           node {
             sourceUrl
