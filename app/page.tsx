@@ -1,175 +1,214 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
+
+import ArticleCard from "./components/ArticleCard";
+import CategorySection from "./components/CategorySection";
+import FeaturedSection from "./components/FeaturedSection";
+import Footer from "./components/Footer";
+import Sidebar, { SidebarPost } from "./components/Sidebar";
 import client from "../lib/apolloClient";
 import { GET_POSTS } from "../lib/queries/postsQuery";
-import Link from "next/link";
 
-type WPPost = {
+export type WPPost = {
   id: string;
   title: string;
   slug: string;
   date: string;
   excerpt: string;
-  featuredImage?: { node?: { sourceUrl?: string } };
+  commentCount?: number | null;
+  categories?: { nodes?: Array<{ name?: string | null } | null> | null } | null;
+  featuredImage?: { node?: { sourceUrl?: string | null } | null } | null;
 };
 
-function Card({ post, layout = "default" }: { post: WPPost; layout?: "hero" | "featured" | "default" }) {
-  const img = post.featuredImage?.node?.sourceUrl;
-  const href = `https://go2njemacka.de/${post.slug}`;
+type SectionConfig = {
+  title: string;
+  slug: string;
+  accentColor?: string;
+};
 
-  const base =
-    "group relative overflow-hidden rounded-3xl bg-white shadow-md ring-1 ring-black/5 transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5";
-  const imgClass =
-    layout === "hero"
-      ? "h-[360px] md:h-[420px] w-full object-cover"
-      : layout === "featured"
-      ? "h-56 w-full object-cover"
-      : "h-44 w-full object-cover";
-
-  return (
-    <Link href={href} target="_blank" className={base}>
-      <div className="relative">
-        {img ? (
-          <img src={img} alt={post.title} className={`${imgClass} transition-transform duration-500 group-hover:scale-105`} />
-        ) : (
-          <div className={`${imgClass} bg-gradient-to-br from-gray-100 to-gray-200`} />
-        )}
-        {layout === "hero" && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        )}
-      </div>
-
-      <div
-        className={
-          layout === "hero"
-            ? "absolute inset-x-0 bottom-0 p-6 md:p-8 text-white"
-            : "p-5"
-        }
-      >
-        <h3
-          className={
-            layout === "hero"
-              ? "text-2xl md:text-3xl font-extrabold leading-snug drop-shadow"
-              : layout === "featured"
-              ? "text-lg font-semibold text-gray-900"
-              : "text-base font-semibold text-gray-900"
-          }
-          dangerouslySetInnerHTML={{ __html: post.title }}
-        />
-        <div
-          className={
-            layout === "hero"
-              ? "mt-3 hidden md:block text-white/90"
-              : "mt-2 line-clamp-3 text-gray-600 text-sm"
-          }
-          dangerouslySetInnerHTML={{ __html: post.excerpt }}
-        />
-        <span
-          className={
-            layout === "hero"
-              ? "mt-4 inline-flex items-center gap-1 text-emerald-300 font-semibold"
-              : "mt-3 inline-flex items-center gap-1 text-emerald-700 font-semibold"
-          }
-        >
-          Čitaj više →
-        </span>
-      </div>
-    </Link>
-  );
-}
+const CATEGORY_SECTIONS: SectionConfig[] = [
+  { title: "Savjeti", slug: "savjeti", accentColor: "bg-[#FF5C5C]" },
+  { title: "Dokumenti", slug: "dokumenti", accentColor: "bg-[#007BFF]" },
+  { title: "Porodica i život", slug: "porodica-i-zivot", accentColor: "bg-[#20a4f3]" },
+];
 
 export default function Home() {
   const { loading, error, data } = useQuery(GET_POSTS, { client });
+  const [featuredIds, setFeaturedIds] = useState<string[]>([]);
+  const [categoryRegistry, setCategoryRegistry] = useState<Record<string, string[]>>({});
 
-  if (loading)
-    return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-gray-500 text-lg animate-pulse">Učitavam sadržaj…</p>
-      </div>
-    );
+  const posts = useMemo(
+    () => ((data?.posts?.nodes ?? []) as WPPost[]),
+    [data?.posts?.nodes]
+  );
+  const hero = posts[0] ?? null;
+  const highlights = posts.slice(1, 5);
 
-  if (error)
-    return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-red-600 text-lg">Greška: {error.message}</p>
-      </div>
-    );
+  const baseUsed = useMemo(() => new Set<string>(featuredIds), [featuredIds]);
 
-  const posts: WPPost[] = data?.posts?.nodes ?? [];
-  if (posts.length === 0) {
-    return (
-      <div className="min-h-screen grid place-items-center">
-        <p className="text-gray-500">Nema objava.</p>
-      </div>
-    );
+  const registerCategoryPosts = (slug: string, ids: string[]) => {
+    setCategoryRegistry((prev) => {
+      const previous = prev[slug] ?? [];
+      if (previous.length === ids.length && previous.every((id, index) => id === ids[index])) {
+        return prev;
+      }
+
+      return { ...prev, [slug]: ids };
+    });
+  };
+
+  const usedAcrossSections = useMemo(() => {
+    const ids = new Set<string>(baseUsed);
+    Object.values(categoryRegistry).forEach((list) => list.forEach((id) => ids.add(id)));
+    return ids;
+  }, [baseUsed, categoryRegistry]);
+
+  const latestPosts = useMemo(() => {
+    const pool = posts.filter((post) => !usedAcrossSections.has(post.id));
+    return pool.slice(0, 6);
+  }, [posts, usedAcrossSections]);
+
+  const usedWithLatest = useMemo(() => {
+    const ids = new Set<string>(usedAcrossSections);
+    latestPosts.forEach((post) => ids.add(post.id));
+    return ids;
+  }, [latestPosts, usedAcrossSections]);
+
+  const popularPosts = useMemo(() => {
+    const pool = posts.filter((post) => !usedWithLatest.has(post.id));
+    const sortedByComments = [...pool].sort((a, b) => (b.commentCount ?? 0) - (a.commentCount ?? 0));
+    const topCommentCount = sortedByComments[0]?.commentCount ?? 0;
+
+    if (!topCommentCount) {
+      return [...pool]
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 6);
+    }
+
+    return sortedByComments.slice(0, 6);
+  }, [posts, usedWithLatest]);
+
+  const getExcludeIds = (slug: string) => {
+    const ids = new Set<string>(baseUsed);
+    latestPosts.forEach((post) => ids.add(post.id));
+    popularPosts.forEach((post) => ids.add(post.id));
+    Object.entries(categoryRegistry).forEach(([key, value]) => {
+      if (key !== slug) {
+        value.forEach((id) => ids.add(id));
+      }
+    });
+    return Array.from(ids);
+  };
+
+  const sidebarPosts: SidebarPost[] = useMemo(() => {
+    const sorted = [...posts].sort((a, b) => (b.commentCount ?? 0) - (a.commentCount ?? 0));
+    const highest = sorted[0]?.commentCount ?? 0;
+
+    if (highest === 0) {
+      return [...posts]
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 5);
+    }
+
+    return sorted.slice(0, 5);
+  }, [posts]);
+
+  if (loading) {
+    return <div className="grid min-h-[60vh] place-items-center text-lg text-slate-500">Učitavam sadržaj…</div>;
   }
 
-  const [hero, ...rest] = posts;
-  const featured = rest.slice(0, 4);
-  const latest = rest.slice(4);
+  if (error) {
+    return <div className="grid min-h-[60vh] place-items-center text-lg text-red-600">Greška: {error.message}</div>;
+  }
+
+  if (!hero) {
+    return <div className="grid min-h-[60vh] place-items-center text-slate-500">Nema objava.</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">
-      <header className="sticky top-0 z-50 backdrop-blur bg-white/70 border-b border-gray-200">
-        <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="text-emerald-700 font-extrabold text-xl">
-            Go2Njemačka Blog
-          </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-gray-700">
-            <a href="/" className="hover:text-emerald-700">Početna</a>
-            <a href="https://go2njemacka.de" target="_blank" className="hover:text-emerald-700">Posjeti sajt</a>
-          </nav>
-        </div>
-      </header>
+    <div className="bg-[#F8F9FB]">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+          <div className="flex flex-col gap-10">
+            <FeaturedSection
+              hero={hero}
+              highlights={highlights}
+              onPostsUsed={setFeaturedIds}
+            />
 
-      <main className="mx-auto max-w-7xl px-4 py-10 space-y-12">
-        <section>
-          <Card post={hero} layout="hero" />
-        </section>
+            <SectionBlock title="Najnovije" description="Šta se trenutno dešava u zajednici Go2Njemačka.">
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {latestPosts.map((post) => (
+                  <ArticleCard
+                    key={post.id}
+                    post={{
+                      ...post,
+                      categoryName: post.categories?.nodes?.[0]?.name ?? undefined,
+                    }}
+                  />
+                ))}
+              </div>
+            </SectionBlock>
 
-        {featured.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900">Izdvojeno</h2>
-              <a
-                href="https://go2njemacka.de"
-                target="_blank"
-                className="text-emerald-700 hover:underline font-medium"
-              >
-                Sve objave →
-              </a>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {featured.map((p) => (
-                <Card key={p.id} post={p} layout="featured" />
-              ))}
-            </div>
-          </section>
-        )}
+            {popularPosts.length > 0 && (
+              <SectionBlock title="Popularno" description="Teme koje najviše privlače pažnju naših čitatelja.">
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {popularPosts.map((post) => (
+                    <ArticleCard
+                      key={post.id}
+                      post={{
+                        ...post,
+                        categoryName: post.categories?.nodes?.[0]?.name ?? undefined,
+                      }}
+                    />
+                  ))}
+                </div>
+              </SectionBlock>
+            )}
 
-        {latest.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900">Najnovije</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {latest.map((p) => (
-                <Card key={p.id} post={p} />
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-
-      <footer className="mt-12 border-t border-gray-200">
-        <div className="mx-auto max-w-7xl px-4 py-6 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} Go2Njemačka.de — Sva prava zadržana.</p>
-          <div className="flex items-center gap-5">
-            <a href="https://go2njemacka.de/kontakt" target="_blank" className="hover:text-gray-700">Kontakt</a>
-            <a href="https://go2njemacka.de/o-nama" target="_blank" className="hover:text-gray-700">O nama</a>
+            {CATEGORY_SECTIONS.map((section) => (
+              <CategorySection
+                key={section.slug}
+                title={section.title}
+                slug={section.slug}
+                sectionId={section.slug}
+                accentColor={section.accentColor}
+                excludeIds={getExcludeIds(section.slug)}
+                onPostsFetched={(ids) => registerCategoryPosts(section.slug, ids)}
+              />
+            ))}
           </div>
+
+          <Sidebar posts={sidebarPosts} />
         </div>
-      </footer>
+      </div>
+
+      <Footer />
     </div>
   );
 }
 
+type SectionBlockProps = {
+  title: string;
+  description?: string;
+  children: ReactNode;
+};
+
+function SectionBlock({ title, description, children }: SectionBlockProps) {
+  return (
+    <section className="scroll-mt-28 space-y-6 rounded-[32px] border border-slate-200/80 bg-white p-6 shadow-md sm:p-8">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-[#FF3B3B]">Go2Njemačka</span>
+          <h2 className="text-2xl font-heading font-semibold text-slate-900">{title}</h2>
+          {description ? <p className="text-sm text-slate-600">{description}</p> : null}
+        </div>
+        <div className="h-1 w-24 rounded-full bg-gradient-to-r from-[#FF3B3B] via-[#007BFF] to-[#0056b3]" />
+      </div>
+      {children}
+    </section>
+  );
+}
