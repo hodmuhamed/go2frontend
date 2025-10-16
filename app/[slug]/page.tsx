@@ -9,10 +9,10 @@ import { GET_RELATED_POSTS } from "../../lib/queries/relatedPostsQuery";
 import { GET_POSTS } from "../../lib/queries/postsQuery";
 import { GET_CATEGORY_ARCHIVE } from "../../lib/queries/categoryArchiveQuery";
 
-type PageProps = {
-  params: { slug: string };
-  searchParams?: { after?: string };
-};
+interface PageProps {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ after?: string }>;
+}
 
 type PostData = {
   post: {
@@ -70,8 +70,9 @@ const formatDate = (value: string) => {
 };
 
 export default async function PostPage({ params, searchParams }: PageProps) {
-  const slug = params.slug;
-  const after = typeof searchParams?.after === "string" ? searchParams.after : undefined;
+  const { slug } = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
+  const after = typeof resolvedSearch.after === "string" ? resolvedSearch.after : undefined;
   const [{ data }, popular] = await Promise.all([
     client.query<PostData>({
       query: GET_POST_BY_SLUG,

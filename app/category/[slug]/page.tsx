@@ -7,10 +7,10 @@ import client from "../../../lib/apolloClient";
 import { GET_CATEGORY_ARCHIVE } from "../../../lib/queries/categoryArchiveQuery";
 import { GET_POSTS } from "../../../lib/queries/postsQuery";
 
-type PageProps = {
-  params: { slug: string };
-  searchParams?: { after?: string };
-};
+interface PageProps {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ after?: string }>;
+}
 
 type CategoryPost = {
   id: string;
@@ -43,8 +43,9 @@ const formatDate = (date: string) => {
 };
 
 export default async function CategoryPage({ params, searchParams }: PageProps) {
-  const slug = params.slug;
-  const after = typeof searchParams?.after === "string" ? searchParams.after : undefined;
+  const { slug } = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
+  const after = typeof resolvedSearch.after === "string" ? resolvedSearch.after : undefined;
 
   const [{ data }, popular] = await Promise.all([
     client.query<CategoryData>({
