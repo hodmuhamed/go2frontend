@@ -128,6 +128,7 @@ export default function Home() {
     return <div className="grid min-h-[60vh] place-items-center text-slate-500">Nema objava.</div>;
   }
 
+function ContactSection() {
   return (
     <div className="bg-[#F8F9FB]">
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
