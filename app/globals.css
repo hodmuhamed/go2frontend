@@ -15,7 +15,7 @@ h4,
 h5,
 h6,
 .font-heading {
-  font-family: var(--font-heading), "Poppins", system-ui, sans-serif;
+  font-family: var(--font-heading), "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 .font-body {

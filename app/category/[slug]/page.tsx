@@ -131,7 +131,7 @@ function CategoryCard({ post }: CardProps) {
       href={href}
       className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
     >
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-44 w-full overflow-hidden">
         {img ? (
           <Image
             src={img}
@@ -144,12 +144,11 @@ function CategoryCard({ post }: CardProps) {
           <div className="h-full w-full bg-slate-100" />
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-3 p-6">
+      <div className="flex flex-1 flex-col gap-4 p-6">
         <h3
-          className="text-lg font-semibold text-slate-800 transition-colors group-hover:text-[#007BFF]"
+          className="line-clamp-2 text-lg font-semibold text-slate-800 transition-colors group-hover:text-[#007BFF]"
           dangerouslySetInnerHTML={{ __html: post.title }}
         />
-        <p className="line-clamp-3 text-sm text-slate-600" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
         <span className="mt-auto text-xs font-medium uppercase tracking-[0.25em] text-slate-500">{formatDate(post.date)}</span>
       </div>
     </Link>

@@ -105,8 +105,8 @@ export default function Home() {
 
   return (
     <div className="bg-[#F8F9FB]">
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,2.25fr)_minmax(0,1fr)]">
           <div className="flex flex-col gap-10">
             <section id="home" className="grid gap-8 rounded-[32px] bg-white p-6 shadow-md sm:p-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
               <HeroPost post={hero} />
@@ -188,7 +188,7 @@ function HeroPost({ post }: PostCardProps) {
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-[28px] sm:min-h-[300px]"
+      className="group relative flex min-h-[220px] flex-col overflow-hidden rounded-[28px] sm:min-h-[280px] lg:min-h-[300px]"
     >
       {img ? (
         <Image
@@ -204,7 +204,7 @@ function HeroPost({ post }: PostCardProps) {
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/45 to-transparent" />
 
-      <div className="relative z-10 mt-auto flex flex-col gap-3 p-6 text-white sm:p-8">
+      <div className="relative z-10 mt-auto flex flex-col gap-2 p-6 text-white sm:p-8">
         <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#FF5C5C] backdrop-blur">
           Istaknuta priča
         </span>
@@ -217,7 +217,7 @@ function HeroPost({ post }: PostCardProps) {
             <span className="text-sm text-white/70">{formatDate(post.date)}</span>
           </div>
           <p
-            className="max-w-2xl text-sm text-white/80 sm:text-base"
+            className="max-w-2xl text-sm text-white/80 sm:text-base lg:line-clamp-3"
             dangerouslySetInnerHTML={{ __html: post.excerpt }}
           />
         </div>
@@ -248,7 +248,7 @@ function HighlightCard({ post }: PostCardProps) {
       </div>
       <div className="flex flex-1 flex-col gap-2">
         <h3
-          className="text-sm font-semibold text-slate-800 transition-colors group-hover:text-[#007BFF]"
+          className="line-clamp-3 text-sm font-semibold text-slate-800 transition-colors group-hover:text-[#007BFF]"
           dangerouslySetInnerHTML={{ __html: post.title }}
         />
         <span className="text-xs text-slate-500">{formatDate(post.date)}</span>
@@ -279,12 +279,11 @@ function LatestCard({ post }: PostCardProps) {
           <div className="h-full w-full bg-slate-100" />
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-3 p-6">
+      <div className="flex flex-1 flex-col gap-4 p-6">
         <h3
-          className="text-lg font-semibold text-slate-800 transition-colors group-hover:text-[#007BFF]"
+          className="line-clamp-3 text-lg font-semibold text-slate-800 transition-colors group-hover:text-[#007BFF]"
           dangerouslySetInnerHTML={{ __html: post.title }}
         />
-        <p className="line-clamp-3 text-sm text-slate-600" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
         <div className="mt-auto text-xs font-medium uppercase tracking-[0.25em] text-slate-500">{formatDate(post.date)}</div>
       </div>
     </Link>

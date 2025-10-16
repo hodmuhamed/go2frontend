@@ -114,12 +114,12 @@ export default function CategorySection({
     content = (
       <div
         className={`grid gap-6 lg:gap-8 ${
-          hasSupporting ? "lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]" : ""
+          hasSupporting ? "lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]" : ""
         }`}
       >
         <CategoryHeroCard post={hero} accentColor={accentColor} />
         {hasSupporting ? (
-          <div className="flex h-full flex-col divide-y divide-slate-200/70 overflow-hidden rounded-[24px] border border-slate-200/70 bg-white/70 shadow-sm backdrop-blur">
+          <div className="flex h-full flex-col divide-y divide-slate-200/70 overflow-hidden rounded-[24px] border border-slate-200/80 bg-white/70 shadow-sm backdrop-blur">
             {rest.map((post, index) => (
               <CategoryListCard
                 key={post.id}
@@ -137,16 +137,16 @@ export default function CategorySection({
   return (
     <section
       id={sectionId}
-      className="scroll-mt-28 overflow-hidden rounded-[32px] border border-slate-200/80 bg-white shadow-[0_24px_48px_-24px_rgba(15,23,42,0.25)]"
+      className="scroll-mt-28 overflow-hidden rounded-[32px] border border-slate-200/80 bg-white shadow-[0_24px_48px_-24px_rgba(15,23,42,0.18)]"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 px-6 pb-4 pt-6 sm:px-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-6 pb-5 pt-6 sm:px-8">
         <span className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.35em] text-slate-700">
           <span className={`h-2.5 w-2.5 rounded-sm ${accentColor}`} />
           {title}
         </span>
         <Link
           href={`/category/${slug}`}
-          className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition hover:text-slate-600"
+          className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500 transition hover:text-slate-700"
         >
           Sve iz sekcije
         </Link>
@@ -171,9 +171,9 @@ function CategoryHeroCard({ post, accentColor }: CardProps) {
   return (
     <Link
       href={href}
-      className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#eef2ff]">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#eef2ff]">
         {img ? (
           <>
             <Image
@@ -183,7 +183,7 @@ function CategoryHeroCard({ post, accentColor }: CardProps) {
               sizes="(min-width: 1024px) 55vw, 100vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
           </>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-white via-[#F8F9FB] to-[#e0e7ff] text-sm font-semibold uppercase tracking-[0.35em] text-slate-400">
@@ -198,11 +198,11 @@ function CategoryHeroCard({ post, accentColor }: CardProps) {
           </span>
         ) : null}
         <h3
-          className="text-xl font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#007BFF] sm:text-2xl"
+          className="line-clamp-3 text-xl font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#007BFF] sm:text-2xl"
           dangerouslySetInnerHTML={{ __html: post.title }}
         />
         <p
-          className="line-clamp-3 text-sm text-slate-600"
+          className="line-clamp-2 text-sm text-slate-600"
           dangerouslySetInnerHTML={{ __html: post.excerpt }}
         />
         <div className="mt-auto flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.3em] text-slate-500">
@@ -242,12 +242,8 @@ function CategoryListCard({ post, accentColor, isFirst = false }: CardProps) {
           <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-red-500">{label}</span>
         ) : null}
         <h4
-          className="text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#007BFF] sm:text-base"
+          className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#007BFF] sm:text-base"
           dangerouslySetInnerHTML={{ __html: post.title }}
-        />
-        <p
-          className="hidden text-xs text-slate-600 md:block md:line-clamp-2"
-          dangerouslySetInnerHTML={{ __html: post.excerpt }}
         />
         <div className="mt-auto flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.3em] text-slate-500">
           <span className={`h-1.5 w-1.5 rounded-full ${accentColor}`} />
